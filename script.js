@@ -57,8 +57,23 @@ async function searchData() {
     document.getElementById("result").innerHTML = "<p>Tidak ada hasil ditemukan.</p>";
     return;
   }
+  // Ubah nilai Date(...) jadi format tanggal biasa
+function formatCell(value) {
+  if (typeof value === "string" && value.startsWith("Date(")) {
+    const parts = value.match(/\d+/g);
+    if (parts && parts.length >= 3) {
+      const year = parts[0];
+      const month = parseInt(parts[1]) + 1;
+      const day = parts[2];
+      return `${day}/${month}/${year}`;
+    }
+  }
+  return value === "null" ? "" : value;
+}
 
-  let tableHTML = "<table><tr>" + headers.map(h => `<th>${h}</th>`).join('') + "</tr>";
+
+  tableHTML += "<tr>" + row.map(c => `<td>${formatCell(c)}</td>`).join("") + "</tr>";
+
   filtered.forEach(row => {
     tableHTML += "<tr>" + row.map(c => `<td>${c}</td>`).join('') + "</tr>";
   });
