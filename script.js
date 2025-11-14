@@ -36,18 +36,13 @@ animate();
 //------------------------------------------------------
 // Search Function (You must replace SHEET_URL with Web-Published Sheet)
 //------------------------------------------------------
-async function loadCSV() {
-  const url = "https://docs.google.com/spreadsheets/d/14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10/export?format=csv&id=14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10&gid=1401067179";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnFAKE_URL_PUBLISH/output=csv"; // ganti! wajib URL publik CSV
 
-  const response = await fetch(url);
-  const text = await response.text();
-
-  // Convert CSV → array
-  const rows = text.trim().split("\n").map(r => r.split(","));
-
-  console.log(rows); // <<< cek apakah tampil
+async function fetchCSV() {
+  const res = await fetch(SHEET_URL);
+  const text = await res.text();
+  return Papa.parse(text, { header: true }).data;
 }
-
 
 async function searchData() {
   const keyword = document.getElementById("searchInput").value.toLowerCase();
@@ -111,3 +106,16 @@ function formatDate(dateStr) {
 document.getElementById("searchBtn").addEventListener("click", searchData);}
 
 
+// Updated Google Sheet loader
+async function loadSheet() {
+  const sheetID = "14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10";
+  const sheetName = "Form_Responses_1";
+  const base = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
+
+  const response = await fetch(base);
+  const text = await response.text();
+  const json = JSON.parse(text.substring(47, text.length - 2));
+
+  const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
+  return rows;
+}
