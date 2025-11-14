@@ -105,7 +105,6 @@ function formatDate(dateStr) {
 //------------------------------------------------------
 document.getElementById("searchBtn").addEventListener("click", searchData);}
 
-
 // Updated Google Sheet loader
 async function loadSheet() {
   const sheetID = "14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10";
@@ -119,3 +118,4 @@ async function loadSheet() {
   const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
   return rows;
 }
+
