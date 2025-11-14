@@ -36,14 +36,18 @@ animate();
 //------------------------------------------------------
 // Search Function (You must replace SHEET_URL with Web-Published Sheet)
 //------------------------------------------------------
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10/export?format=csv&gid=1401067179
-; // ganti! wajib URL publik CSV
+async function loadCSV() {
+  const url = "https://docs.google.com/spreadsheets/d/14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10/export?format=csv&id=14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10&gid=1401067179";
 
-async function fetchCSV() {
-  const res = await fetch(SHEET_URL);
-  const text = await res.text();
-  return Papa.parse(text, { header: true }).data;
+  const response = await fetch(url);
+  const text = await response.text();
+
+  // Convert CSV → array
+  const rows = text.trim().split("\n").map(r => r.split(","));
+
+  console.log(rows); // <<< cek apakah tampil
 }
+
 
 async function searchData() {
   const keyword = document.getElementById("searchInput").value.toLowerCase();
@@ -105,4 +109,5 @@ function formatDate(dateStr) {
 // Event
 //------------------------------------------------------
 document.getElementById("searchBtn").addEventListener("click", searchData);}
+
 
