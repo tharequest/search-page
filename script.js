@@ -36,7 +36,8 @@ animate();
 //------------------------------------------------------
 // Search Function (You must replace SHEET_URL with Web-Published Sheet)
 //------------------------------------------------------
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnFAKE_URL_PUBLISH/output=csv"; // ganti! wajib URL publik CSV
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10/export?format=csv&gid=1401067179
+; // ganti! wajib URL publik CSV
 
 async function fetchCSV() {
   const res = await fetch(SHEET_URL);
@@ -104,3 +105,4 @@ function formatDate(dateStr) {
 // Event
 //------------------------------------------------------
 document.getElementById("searchBtn").addEventListener("click", searchData);}
+
