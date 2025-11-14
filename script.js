@@ -1,83 +1,106 @@
-// --- ANIMASI PARTIKEL PIXEL ---
-const canvas = document.getElementById('bg');
-const ctx = canvas.getContext('2d');
+// Background Animation
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particles = [];
-
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 60; i++) {
   particles.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    size: Math.random() * 2,
-    speedX: (Math.random() - 0.5) * 0.5,
-    speedY: (Math.random() - 0.5) * 0.5
+    r: Math.random() * 3 + 1,
+    dx: (Math.random() - 0.5) * 0.6,
+    dy: (Math.random() - 0.5) * 0.6,
   });
 }
 
-function animateParticles() {
+function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = 'rgba(0, 255, 255, 0.8)';
-  particles.forEach(p => {
+  particles.forEach((p) => {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = "#3fa9ff";
     ctx.fill();
-    p.x += p.speedX;
-    p.y += p.speedY;
 
-    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
-    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+    p.x += p.dx;
+    p.y += p.dy;
+
+    if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+    if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
   });
-  requestAnimationFrame(animateParticles);
+  requestAnimationFrame(animate);
 }
-animateParticles();
+animate();
 
-// --- LOGIKA PENCARIAN GOOGLE SHEET ---
-const sheetID = "14gqgDFM0p60Ldteyr32zirIr_1AZuf3CXemQz4mPJ10";
-const sheetName = "Form_Responses";
-const base = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?sheet=${sheetName}`;
+//------------------------------------------------------
+// Search Function (You must replace SHEET_URL with Web-Published Sheet)
+//------------------------------------------------------
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnFAKE_URL_PUBLISH/output=csv"; // ganti! wajib URL publik CSV
 
-document.getElementById("searchBtn").addEventListener("click", searchData);
+async function fetchCSV() {
+  const res = await fetch(SHEET_URL);
+  const text = await res.text();
+  return Papa.parse(text, { header: true }).data;
+}
 
 async function searchData() {
-  const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-  const res = await fetch(base);
-  const text = await res.text();
-  const json = JSON.parse(text.substr(47).slice(0, -2));
+  const keyword = document.getElementById("searchInput").value.toLowerCase();
+  const resultBox = document.getElementById("result");
 
-  let data = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
-  const headers = json.table.cols.map(c => c.label);
+  if (!keyword) {
+    resultBox.innerHTML = "";
+    return;
+  }
 
-  const filtered = data.filter(row => 
-    row.some(cell => cell.toString().toLowerCase().includes(keyword))
+  const data = await fetchCSV();
+
+  const filtered = data.filter(
+    (row) => row.Nama?.toLowerCase().includes(keyword) || row.NIM?.toLowerCase().includes(keyword)
   );
 
   if (filtered.length === 0) {
-    document.getElementById("result").innerHTML = "<p>Tidak ada hasil ditemukan.</p>";
+    resultBox.innerHTML = `<p style="text-align:center;margin-top:20px;">Tidak ada data ditemukan.</p>`;
     return;
   }
-  // Ubah nilai Date(...) jadi format tanggal biasa
-function formatCell(value) {
-  if (typeof value === "string" && value.startsWith("Date(")) {
-    const parts = value.match(/\d+/g);
-    if (parts && parts.length >= 3) {
-      const year = parts[0];
-      const month = parseInt(parts[1]) + 1;
-      const day = parts[2];
-      return `${day}/${month}/${year}`;
-    }
-  }
-  return value === "null" ? "" : value;
-}
 
+  let tableHTML = `<table>
+    <tr>
+      <th>Nama</th>
+      <th>NIM</th>
+      <th>Prodi</th>
+      <th>Tanggal Lahir</th>
+    </tr>`;
 
-  tableHTML += "<tr>" + row.map(c => `<td>${formatCell(c)}</td>`).join("") + "</tr>";
-
-  filtered.forEach(row => {
-    tableHTML += "<tr>" + row.map(c => `<td>${c}</td>`).join('') + "</tr>";
+  filtered.forEach((row) => {
+    tableHTML += `
+      <tr>
+        <td>${row.Nama}</td>
+        <td>${row.NIM}</td>
+        <td>${row.Prodi}</td>
+        <td>${formatDate(row.Tanggal)}</td>
+      </tr>`;
   });
-  tableHTML += "</table>";
 
-  document.getElementById("result").innerHTML = tableHTML;
+  tableHTML += `</table>`;
+  resultBox.innerHTML = tableHTML;
 }
+
+//------------------------------------------------------
+// Format Tanggal
+//------------------------------------------------------
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+//------------------------------------------------------
+// Event
+//------------------------------------------------------
+document.getElementById("searchBtn").addEventListener("click", searchData);}
