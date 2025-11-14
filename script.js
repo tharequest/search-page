@@ -103,7 +103,7 @@ function formatDate(dateStr) {
 //------------------------------------------------------
 // Event
 //------------------------------------------------------
-document.getElementById("searchBtn").addEventListener("click", searchData);}
+document.getElementById("searchBtn").addEventListener("click", searchData);
 
 // Updated Google Sheet loader
 async function loadSheet() {
@@ -118,4 +118,5 @@ async function loadSheet() {
   const rows = json.table.rows.map(r => r.c.map(c => (c ? c.v : "")));
   return rows;
 }
+
 
